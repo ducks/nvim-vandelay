@@ -3,7 +3,6 @@ local M = {}
 M.defaults = {
   threshold = 2,
   indent = 2,
-  auto = false,
 }
 
 M.options = {}
