@@ -11,10 +11,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Setup Neovim
-      uses: rhysd/action-setup-neovim@v1
-      with:
-        neovim-version: stable
+    - name: Install Neovim
+      run: sudo apt-get install -y neovim
 
     - name: Install plenary.nvim
       run: |
@@ -24,4 +22,3 @@ jobs:
     - name: Run tests
       run: |
         nvim --headless -c 'PlenaryBustedDirectory tests/ --minimal_init=tests/minimal_init.lua'
-
