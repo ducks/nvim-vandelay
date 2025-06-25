@@ -1,4 +1,4 @@
-local formatter = require('vandelay.formatters.javascript')
+local formatter = require('vandelay.languages.javascript')
 local config = require('vandelay.config')
 
 describe('javascript formatter alphabetize option', function()
