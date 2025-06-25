@@ -23,7 +23,8 @@ function M.format_current_line()
   local formatted = lang.format_line(bufnr, line)
 
   if formatted then
-    vim.api.nvim_buf_set_lines(bufnr, row, row + 1, false, { formatted })
+    local lines = vim.split(formatted, '\n', { plain = true })
+    vim.api.nvim_buf_set_lines(bufnr, row, row + 1, false, lines)
   end
 end
 
