@@ -1,24 +1,24 @@
+local formatter = require('vandelay.formatter')
+
 local M = {}
-local config = require('vandelay.config')
 
-function M.format_line(line)
-  local pattern = [[use%s*(.-)::%s*{%s*(.-)%s*};]]
-  local base, imports = line:match(pattern)
-  if not base or not imports then return nil end
-
-  local parts = {}
-  for item in imports:gmatch('[^,]+') do
-    table.insert(parts, vim.trim(item))
+function M.format_line(bufnr, line)
+  local pattern = [[use%s+(.-)%s*{%s*(.-)%s*};]]
+  local path, names = string.match(line, pattern)
+  if not path or not names then
+    return nil
   end
 
-  if #parts < config.options.threshold then return nil end
-
-  local indent = string.rep(' ', config.options.indent)
-  local formatted = 'use ' .. base .. '::{\n'
-  for _, item in ipairs(parts) do
-    formatted = formatted .. indent .. item .. ',\n'
+  local items = {}
+  for name in string.gmatch(names, '([^,]+)') do
+    table.insert(items, vim.trim(name))
   end
-  formatted = formatted .. '};'
+
+  if #items < 2 then
+    return nil
+  end
+
+  local formatted = formatter.format(bufnr, items, 'use ' .. path .. '{', '};')
   return formatted
 end
 

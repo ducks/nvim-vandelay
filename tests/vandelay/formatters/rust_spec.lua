@@ -1,27 +1,51 @@
-local rust = require('vandelay.formatters.rust')
+local formatter = require('vandelay.formatters.rust')
 local config = require('vandelay.config')
 
 describe('rust formatter', function()
-  before_each(function()
-    config.setup({ threshold = 2, indent = 2 })
+
+  it('formats multi imports with alphabetize = true', function()
+    config.setup({ alphabetize = true })
+
+    vim.bo.shiftwidth = 4
+    vim.bo.expandtab = true
+
+    local bufnr = 0
+    local line = "use std::{ io, fs, path };"
+    local expected = [[use std::{
+    fs,
+    io,
+    path,
+};]]
+
+    local result = formatter.format_line(bufnr, line)
+    assert.equals(expected, result)
+  end)
+
+  it('formats multi imports with alphabetize = false', function()
+    config.setup({ alphabetize = false })
+
+    vim.bo.shiftwidth = 4
+    vim.bo.expandtab = true
+
+    local bufnr = 0
+    local line = "use std::{ io, fs, path };"
+    local expected = [[use std::{
+    io,
+    fs,
+    path,
+};]]
+
+    local result = formatter.format_line(bufnr, line)
+    assert.equals(expected, result)
   end)
 
   it('does not modify single imports', function()
-    local input = "use std::fs;"
-    local result = rust.format_line(input)
+    config.setup({ alphabetize = true })
+
+    local bufnr = 0
+    local line = "use std::{ fs };"
+    local result = formatter.format_line(bufnr, line)
     assert.is_nil(result)
   end)
 
-  it('formats multi imports correctly', function()
-    local input = "use std::{fs, io, path};"
-    local expected = [[use std::{
-  fs,
-  io,
-  path,
-};]]
-
-    local result = rust.format_line(input)
-    assert.are.same(expected, result)
-  end)
 end)
-
