@@ -1,4 +1,4 @@
-local formatter = require('vandelay.formatters.rust')
+local formatter = require('vandelay.languages.rust')
 local config = require('vandelay.config')
 
 describe('rust formatter', function()
