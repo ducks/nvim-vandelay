@@ -1,42 +1,30 @@
-local M = {}
-local js = require('vandelay.formatters.javascript')
-local rust = require('vandelay.formatters.rust')
-
-local handlers = {
-  javascript = js,
-  typescript = js,
-  rust = rust,
+local languages = {
+  javascript = require('vandelay.languages.javascript'),
+  typescript = require('vandelay.languages.javascript'),
+  rust = require('vandelay.languages.rust'),
 }
 
-function M.get_handler()
-  local ft = vim.bo.filetype
-  return handlers[ft]
-end
+local M = {}
 
 function M.format_current_line()
-  local handler = M.get_handler()
-  if not handler then return end
+  local bufnr = vim.api.nvim_get_current_buf()
+  local filetype = vim.api.nvim_buf_get_option(bufnr, 'filetype')
+  local lang = languages[filetype]
 
-  local line = vim.api.nvim_get_current_line()
-  local formatted = handler.format_line(line)
-  if formatted then
-    local linenr = vim.api.nvim_win_get_cursor(0)[1]
-    vim.api.nvim_buf_set_lines(0, linenr-1, linenr, false, vim.split(formatted, '\n'))
+  if not lang then
+    vim.notify('Vandelay: unsupported filetype ' .. filetype, vim.log.levels.WARN)
+    return
   end
-end
 
-function M.format_buffer()
-  local handler = M.get_handler()
-  if not handler then return end
+  local row = vim.api.nvim_win_get_cursor(0)[1] - 1
+  local line = vim.api.nvim_buf_get_lines(bufnr, row, row + 1, false)[1]
 
-  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-  local changed = false
-  for idx, line in ipairs(lines) do
-    local formatted = handler.format_line(line)
-    if formatted then
-      vim.api.nvim_buf_set_lines(0, idx-1, idx, false, vim.split(formatted, '\n'))
-      changed = true
-    end
+  -- Ask the language formatter if this line should be reformatted
+  local formatted = lang.format_line(bufnr, line)
+
+  if formatted then
+    local lines = vim.split(formatted, '\n', { plain = true })
+    vim.api.nvim_buf_set_lines(bufnr, row, row + 1, false, lines)
   end
 end
 

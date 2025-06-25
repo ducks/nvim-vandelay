@@ -2,7 +2,7 @@ local M = {}
 
 M.defaults = {
   threshold = 2,
-  indent = 2,
+  alphabetize = true,
 }
 
 M.options = {}
