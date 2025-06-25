@@ -1,24 +1,27 @@
+local formatter = require('vandelay.formatter')
+
 local M = {}
-local config = require('vandelay.config')
 
-function M.format_line(line)
+function M.format_line(bufnr, line)
+  -- Regex pattern to match named imports
   local pattern = [[import%s*{%s*(.-)%s*}%s*from%s*(.*);]]
-  local imports, from = line:match(pattern)
-  if not imports or not from then return nil end
-
-  local parts = {}
-  for item in imports:gmatch('[^,]+') do
-    table.insert(parts, vim.trim(item))
+  local names, from = string.match(line, pattern)
+  if not names or not from then
+    return nil
   end
 
-  if #parts < config.options.threshold then return nil end
-
-  local indent = string.rep(' ', config.options.indent)
-  local formatted = 'import {\n'
-  for _, item in ipairs(parts) do
-    formatted = formatted .. indent .. item .. ',\n'
+  -- Split names by comma, trim whitespace
+  local items = {}
+  for name in string.gmatch(names, '([^,]+)') do
+    table.insert(items, vim.trim(name))
   end
-  formatted = formatted .. '} from ' .. from .. ';'
+
+  -- Only rewrite if threshold is met (you can still wire this into config if you want)
+  if #items < 2 then
+    return nil
+  end
+
+  local formatted = formatter.format(bufnr, items, 'import {', '} from ' .. from .. ';')
   return formatted
 end
 

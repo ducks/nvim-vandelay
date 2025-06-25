@@ -1,26 +1,51 @@
-local javascript = require('vandelay.formatters.javascript')
+local formatter = require('vandelay.formatters.javascript')
 local config = require('vandelay.config')
 
-describe('javascript formatter', function()
-  before_each(function()
-    config.setup({ threshold = 2, indent = 2 })
-  end)
+describe('javascript formatter alphabetize option', function()
 
-  it('does not modify single imports', function()
-    local input = "import { foo } from './utils';"
-    local result = javascript.format_line(input)
-    assert.is_nil(result)
-  end)
+  it('formats with alphabetize = true', function()
+    config.setup({ alphabetize = true })
 
-  it('formats multi imports correctly', function()
-    local input = "import { foo, bar, baz } from './utils';"
+    local bufnr = 0
+    local line = "import { bar, foo, baz } from './utils';"
     local expected = [[import {
-  foo,
   bar,
+  baz,
+  foo,
+} from './utils';]]
+
+    local result = formatter.format_line(bufnr, line)
+    assert.equals(expected, result)
+  end)
+
+  it('formats with alphabetize = false', function()
+    config.setup({ alphabetize = false })
+
+    local bufnr = 0
+    local line = "import { bar, foo, baz } from './utils';"
+    local expected = [[import {
+  bar,
+  foo,
   baz,
 } from './utils';]]
 
-    local result = javascript.format_line(input)
-    assert.are.same(expected, result:gsub(";", ";"))  -- normalize trailing semicolon
+    local result = formatter.format_line(bufnr, line)
+    assert.equals(expected, result)
   end)
+
+end)
+
+describe('javascript formatter threshold handling', function()
+
+  it('does not modify single imports', function()
+    config.setup({ alphabetize = true, threshold = 2 })
+
+    local bufnr = 0
+    local line = "import { foo } from './utils';"
+    local result = formatter.format_line(bufnr, line)
+
+    -- Expect no formatting change, should return nil
+    assert.is_nil(result)
+  end)
+
 end)
