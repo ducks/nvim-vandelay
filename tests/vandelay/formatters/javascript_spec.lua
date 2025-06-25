@@ -6,6 +6,9 @@ describe('javascript formatter alphabetize option', function()
   it('formats with alphabetize = true', function()
     config.setup({ alphabetize = true })
 
+    vim.bo.shiftwidth = 2
+    vim.bo.expandtab = true
+
     local bufnr = 0
     local line = "import { bar, foo, baz } from './utils';"
     local expected = [[import {
@@ -20,6 +23,9 @@ describe('javascript formatter alphabetize option', function()
 
   it('formats with alphabetize = false', function()
     config.setup({ alphabetize = false })
+
+    vim.bo.shiftwidth = 2
+    vim.bo.expandtab = true
 
     local bufnr = 0
     local line = "import { bar, foo, baz } from './utils';"
