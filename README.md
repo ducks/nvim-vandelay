@@ -25,8 +25,8 @@ A Neovim plugin to automatically expand multiline imports.
   'ducks/nvim-vandelay',
   config = function()
     require('vandelay').setup({
+      alphabetize = true, -- alphabetize module imports
       threshold = 2, -- min items to multiline
-      indent = 2     -- spaces for indent
     })
   end
 }
@@ -34,11 +34,7 @@ A Neovim plugin to automatically expand multiline imports.
 
 ## Usage
 
-By default, run manually:
-
-`:Vandelay`
-
-Or use a keybinding:
+Use a keybinding:
 
 ```
 vim.keymap.set('n', '<leader>mi', function()
